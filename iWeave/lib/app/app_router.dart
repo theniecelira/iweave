@@ -11,8 +11,10 @@ import '../screens/cart/cart_screen.dart';
 import '../screens/tours/book_tour_screen.dart';
 import '../screens/tours/tour_detail_screen.dart';
 import '../screens/bookings/bookings_screen.dart';
+import '../screens/bookings/booking_detail_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/weavers/weavers_screen.dart';
+import '../screens/weavers/weaver_detail_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/itinerary/itinerary_builder_screen.dart';
 
@@ -47,10 +49,16 @@ class AppRouter {
         return _slide(TourDetailScreen(tourId: id));
       case '/bookings':
         return _slide(const BookingsScreen());
+      case '/booking-detail':
+        final id = settings.arguments as String? ?? '';
+        return _slide(BookingDetailScreen(bookingId: id));
       case '/notifications':
         return _slide(const NotificationsScreen());
       case '/weavers':
         return _slide(const WeaversScreen());
+      case '/weaver-detail':
+        final id = settings.arguments as String? ?? '';
+        return _slide(WeaverDetailScreen(weaverId: id));
       case '/profile':
         return _slide(const ProfileScreen());
       case '/itinerary-builder':

@@ -51,6 +51,9 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   onCancel: b.status == BookingStatus.confirmed
                     ? () => _confirmCancel(context, provider, b.id)
                     : null,
+                  onViewDetails: () => Navigator.pushNamed(
+                    context, '/booking-detail', arguments: b.id,
+                  ),
                 );
               },
             ),
@@ -79,91 +82,113 @@ class _BookingsScreenState extends State<BookingsScreen> {
 class _BookingCard extends StatelessWidget {
   final BookingModel booking;
   final VoidCallback? onCancel;
-  const _BookingCard({required this.booking, this.onCancel});
+  final VoidCallback onViewDetails;
+  const _BookingCard({required this.booking, this.onCancel, required this.onViewDetails});
 
   @override
   Widget build(BuildContext context) {
     final statusColor = _statusColor(booking.status);
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-        boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: const Offset(0, 2))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image + Status Badge
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(AppDimensions.radiusXL),
-                  topRight: Radius.circular(AppDimensions.radiusXL),
-                ),
-                child: Image.network(
-                  booking.itemImage, height: 120, width: double.infinity, fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(height: 120, color: AppColors.tagBg),
-                ),
-              ),
-              Positioned(
-                top: 10, right: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(booking.statusLabel, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                ),
-              ),
-              Positioned(
-                top: 10, left: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(_typeLabel(booking.type), style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: onViewDetails,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
+          boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: const Offset(0, 2))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image + Status Badge
+            Stack(
               children: [
-                Text(booking.itemName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary), maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 8),
-                if (booking.checkIn != null)
-                  _InfoRow(Icons.calendar_today_rounded, '${AppFormatters.date(booking.checkIn!)} → ${AppFormatters.date(booking.checkOut!)}'),
-                _InfoRow(Icons.people_rounded, '${booking.guests} ${booking.guests == 1 ? 'guest' : 'guests'}'),
-                _InfoRow(Icons.receipt_long_rounded, 'Total: ${AppFormatters.currency(booking.totalAmount)}'),
-                const SizedBox(height: 2),
-                Text('Booked on ${AppFormatters.date(booking.bookingDate)}',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-                if (onCancel != null) ...[
-                  const SizedBox(height: 12),
-                  Row(children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onCancel,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.error,
-                          side: const BorderSide(color: AppColors.error),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          minimumSize: Size.zero,
-                        ),
-                        child: const Text('Cancel', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                      ),
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(AppDimensions.radiusXL),
+                    topRight: Radius.circular(AppDimensions.radiusXL),
+                  ),
+                  child: Image.network(
+                    booking.itemImage, height: 120, width: double.infinity, fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(height: 120, color: AppColors.tagBg,
+                      child: const Center(child: Icon(Icons.image_not_supported, color: AppColors.textHint))),
+                  ),
+                ),
+                Positioned(
+                  top: 10, right: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
+                    child: Text(booking.statusLabel, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+                Positioned(
+                  top: 10, left: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(_typeLabel(booking.type), style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(booking.itemName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  if (booking.checkIn != null)
+                    _InfoRow(Icons.calendar_today_rounded, '${AppFormatters.date(booking.checkIn!)} → ${booking.checkOut != null ? AppFormatters.date(booking.checkOut!) : 'TBD'}'),
+                  _InfoRow(Icons.people_rounded, '${booking.guests} ${booking.guests == 1 ? 'guest' : 'guests'}'),
+                  _InfoRow(Icons.receipt_long_rounded, 'Total: ${AppFormatters.currency(booking.totalAmount)}'),
+                  const SizedBox(height: 2),
+                  Text('Booked on ${AppFormatters.date(booking.bookingDate)}',
+                    style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+                  if (onCancel != null) ...[
+                    const SizedBox(height: 12),
+                    Row(children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: onCancel,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.error,
+                            side: const BorderSide(color: AppColors.error),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            minimumSize: Size.zero,
+                          ),
+                          child: const Text('Cancel', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: onViewDetails,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            minimumSize: Size.zero,
+                          ),
+                          child: const Text('View Details', style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                    ]),
+                  ],
+                  // For non-confirmed bookings, still show View Details
+                  if (onCancel == null) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: onViewDetails,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -173,48 +198,53 @@ class _BookingCard extends StatelessWidget {
                         child: const Text('View Details', style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600)),
                       ),
                     ),
-                  ]),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Color _statusColor(BookingStatus status) {
     switch (status) {
-      case BookingStatus.confirmed: return AppColors.success;
       case BookingStatus.pending: return AppColors.warning;
-      case BookingStatus.completed: return AppColors.primary;
+      case BookingStatus.confirmed: return AppColors.success;
+      case BookingStatus.completed: return AppColors.info;
       case BookingStatus.cancelled: return AppColors.error;
     }
   }
 
   String _typeLabel(BookingType type) {
     switch (type) {
-      case BookingType.tour: return '🗺 Tour';
-      case BookingType.accommodation: return '🏨 Hotel';
-      case BookingType.product: return '🛍 Order';
+      case BookingType.tour: return 'Tour';
+      case BookingType.accommodation: return 'Stay';
+      case BookingType.product: return 'Product';
     }
   }
 }
 
 class _InfoRow extends StatelessWidget {
   final IconData icon;
-  final String label;
-  const _InfoRow(this.icon, this.label);
+  final String text;
+  const _InfoRow(this.icon, this.text);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
-      child: Row(children: [
-        Icon(icon, size: 14, color: AppColors.textHint),
-        const SizedBox(width: 6),
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary))),
-      ]),
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: AppColors.textHint),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(text, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              overflow: TextOverflow.ellipsis),
+          ),
+        ],
+      ),
     );
   }
 }

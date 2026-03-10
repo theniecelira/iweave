@@ -5,13 +5,32 @@ import '../../core/constants/app_dimensions.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../models/user_model.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load bookings so the count reflects correctly
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userId = context.read<AuthProvider>().user?.id ?? '';
+      if (userId.isNotEmpty) {
+        context.read<BookingProvider>().loadBookings(userId);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final bookings = context.watch<BookingProvider>(); // watch, not read!
+    final cart = context.watch<CartProvider>();
     final user = auth.user;
 
     return Scaffold(
@@ -72,18 +91,18 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Quick Stats
+                  // Quick Stats - use watch providers for live updates
                   Row(children: [
                     _StatCard(
                       label: 'Bookings',
-                      value: '${context.read<BookingProvider>().bookings.length}',
+                      value: '${bookings.bookings.length}',
                       icon: Icons.calendar_today_rounded,
                       onTap: () => Navigator.pushNamed(context, '/bookings'),
                     ),
                     const SizedBox(width: 12),
                     _StatCard(
                       label: 'Cart Items',
-                      value: '${context.read<CartProvider>().count}',
+                      value: '${cart.count}',
                       icon: Icons.shopping_bag_rounded,
                       onTap: () => Navigator.pushNamed(context, '/cart'),
                     ),
@@ -120,35 +139,34 @@ class ProfileScreen extends StatelessWidget {
                   _MenuSection(
                     title: 'About iWeave',
                     items: [
-                      _MenuItem(Icons.info_outline_rounded, 'About Us', () => _showAbout(context)),
-                      _MenuItem(Icons.policy_outlined, 'Terms of Service', () {}),
-                      _MenuItem(Icons.local_shipping_outlined, 'Shipping Policy', () {}),
-                      _MenuItem(Icons.help_outline_rounded, 'FAQs', () {}),
-                      _MenuItem(Icons.mail_outline_rounded, 'Contact Us', () {}),
+                      _MenuItem(Icons.info_outline_rounded, 'About Us', () {}),
+                      _MenuItem(Icons.help_outline_rounded, 'Help & Support', () {}),
+                      _MenuItem(Icons.privacy_tip_outlined, 'Privacy Policy', () {}),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 20),
 
-                  // Logout
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-                      border: Border.all(color: AppColors.error.withOpacity(0.2)),
-                    ),
-                    child: ListTile(
-                      onTap: () => _confirmLogout(context),
-                      leading: const Icon(Icons.logout_rounded, color: AppColors.error),
-                      title: const Text('Sign Out', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
-                      trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.error),
+                  // Logout Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        await auth.logout();
+                        if (context.mounted) {
+                          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                        }
+                      },
+                      icon: const Icon(Icons.logout_rounded, size: 18),
+                      label: const Text('Log Out'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                        side: const BorderSide(color: AppColors.error),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusL)),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  const Text('iWeave v1.0.0 · Est. 2024',
-                    style: TextStyle(fontSize: 11, color: AppColors.textHint)),
-                  const Text('Basey, Samar, Philippines',
-                    style: TextStyle(fontSize: 11, color: AppColors.textHint)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -158,113 +176,69 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out of iWeave?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await context.read<AuthProvider>().logout();
-              if (context.mounted) Navigator.pushReplacementNamed(context, '/login');
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Sign Out', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showEditProfile(BuildContext context) {
     final auth = context.read<AuthProvider>();
-    final nameCtrl = TextEditingController(text: auth.user?.name ?? '');
-    final phoneCtrl = TextEditingController(text: auth.user?.phone ?? '');
+    final user = auth.user;
+    final nameCtrl = TextEditingController(text: user?.name ?? '');
+    final emailCtrl = TextEditingController(text: user?.email ?? '');
 
     showModalBottomSheet(
-      context: context, isScrollControlled: true, useSafeArea: true,
+      context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Edit Profile', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 20),
-              TextField(
-                controller: nameCtrl,
-                decoration: const InputDecoration(labelText: 'Full Name', prefixIcon: Icon(Icons.person_outline)),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: phoneCtrl,
-                decoration: const InputDecoration(labelText: 'Phone Number', prefixIcon: Icon(Icons.phone_outlined)),
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  if (auth.user != null) {
-                    auth.updateUser(auth.user!.copyWith(name: nameCtrl.text, phone: phoneCtrl.text));
-                  }
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Profile updated!'), backgroundColor: AppColors.success),
-                  );
-                },
-                style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50), backgroundColor: AppColors.primary),
-                child: const Text('Save Changes', style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showAbout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(children: [
-          Container(
-            width: 40, height: 40,
-            decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-            child: const Icon(Icons.waving_hand_rounded, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 10),
-          const Text('iWeave'),
-        ]),
-        content: const Column(
+        padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Crafting Unforgettable Experiences, One Tikog at A Time!', style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: AppColors.primary)),
-            SizedBox(height: 12),
-            Text('iWeave is a digital platform that connects tourists and buyers with the master weavers of Basey, Samar — one of the Philippines\'s most celebrated banig-weaving communities.', style: TextStyle(fontSize: 13, height: 1.6, color: AppColors.textSecondary)),
-            SizedBox(height: 12),
-            Text('By team Weannov8 · University of the Philippines Tacloban College · Est. 2024', style: TextStyle(fontSize: 11, color: AppColors.textHint)),
+            const Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 20),
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name', prefixIcon: Icon(Icons.person_outline))),
+            const SizedBox(height: 12),
+            TextField(controller: emailCtrl, decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined))),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (user != null) {
+                    auth.updateUser(UserModel(
+                      id: user.id,
+                      name: nameCtrl.text.trim().isNotEmpty ? nameCtrl.text.trim() : user.name,
+                      email: emailCtrl.text.trim().isNotEmpty ? emailCtrl.text.trim() : user.email,
+                      createdAt: user.createdAt,
+                    ));
+                  }
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(children: [
+                        Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Text('Profile updated!'),
+                      ]),
+                      backgroundColor: AppColors.success,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                child: const Text('Save Changes'),
+              ),
+            ),
           ],
         ),
-        actions: [ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
       ),
     );
   }
 }
 
 class _StatCard extends StatelessWidget {
-  final String label, value;
+  final String label;
+  final String value;
   final IconData icon;
   final VoidCallback onTap;
+
   const _StatCard({required this.label, required this.value, required this.icon, required this.onTap});
 
   @override
@@ -273,18 +247,23 @@ class _StatCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 6)],
+            boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: const Offset(0, 2))],
           ),
-          child: Column(children: [
-            Icon(icon, color: AppColors.primary, size: 22),
-            const SizedBox(height: 6),
-            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
-          ]),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 22, color: AppColors.primary),
+              const SizedBox(height: 8),
+              Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+              const SizedBox(height: 2),
+              Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+                overflow: TextOverflow.ellipsis, maxLines: 1),
+            ],
+          ),
         ),
       ),
     );
@@ -298,43 +277,30 @@ class _MenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textHint, letterSpacing: 0.5)),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusL),
-            boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 6)],
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusL),
+        boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            child: Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textHint)),
           ),
-          child: Column(
-            children: items.asMap().entries.map((e) {
-              final isLast = e.key == items.length - 1;
-              return Column(
-                children: [
-                  ListTile(
-                    onTap: e.value.onTap,
-                    leading: Container(
-                      width: 36, height: 36,
-                      decoration: BoxDecoration(color: AppColors.tagBg, borderRadius: BorderRadius.circular(10)),
-                      child: Icon(e.value.icon, color: AppColors.primary, size: 18),
-                    ),
-                    title: Text(e.value.label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                    trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 18),
-                    dense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-                  ),
-                  if (!isLast) const Divider(height: 0, indent: 14, endIndent: 14, color: AppColors.divider),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ],
+          ...items.map((item) => ListTile(
+            leading: Icon(item.icon, size: 20, color: AppColors.textSecondary),
+            title: Text(item.label, style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
+            trailing: const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textHint),
+            dense: true,
+            visualDensity: const VisualDensity(vertical: -1),
+            onTap: item.onTap,
+          )),
+          const SizedBox(height: 4),
+        ],
+      ),
     );
   }
 }
