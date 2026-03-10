@@ -21,12 +21,14 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE bookings (
             id TEXT PRIMARY KEY,
             userId TEXT NOT NULL,
+            userName TEXT NOT NULL DEFAULT '',
+            userEmail TEXT NOT NULL DEFAULT '',
             itemId TEXT NOT NULL,
             itemName TEXT NOT NULL,
             itemImage TEXT NOT NULL,
@@ -96,6 +98,13 @@ class DatabaseService {
         if (oldVersion < 2) {
           await db.execute('ALTER TABLE users ADD COLUMN avatarUrl TEXT');
         }
+        if (oldVersion < 3) {
+          // Add userName and userEmail columns to bookings
+          await db.execute(
+              "ALTER TABLE bookings ADD COLUMN userName TEXT NOT NULL DEFAULT ''");
+          await db.execute(
+              "ALTER TABLE bookings ADD COLUMN userEmail TEXT NOT NULL DEFAULT ''");
+        }
       },
     );
   }
@@ -109,6 +118,8 @@ class DatabaseService {
       {
         'id': b.id,
         'userId': b.userId,
+        'userName': b.userName,
+        'userEmail': b.userEmail,
         'itemId': b.itemId,
         'itemName': b.itemName,
         'itemImage': b.itemImage,
@@ -162,6 +173,8 @@ class DatabaseService {
     return BookingModel(
       id: m['id'],
       userId: m['userId'],
+      userName: m['userName'] as String? ?? '',
+      userEmail: m['userEmail'] as String? ?? '',
       itemId: m['itemId'],
       itemName: m['itemName'],
       itemImage: m['itemImage'],
@@ -332,7 +345,6 @@ class DatabaseService {
       whereArgs: [id],
       limit: 1,
     );
-
     if (result.isEmpty) return null;
     return result.first;
   }
@@ -345,7 +357,6 @@ class DatabaseService {
       whereArgs: [email],
       limit: 1,
     );
-
     if (result.isEmpty) return null;
     return result.first;
   }
@@ -361,8 +372,7 @@ class DatabaseService {
     final db = await database;
 
     final bookingCount =
-        Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM bookings')) ??
-            0;
+        Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM bookings')) ?? 0;
     final orderCount =
         Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM orders')) ?? 0;
     final userCount =
@@ -390,55 +400,8 @@ class DatabaseService {
 
   Future<void> seedInitialData() async {
     final db = await database;
-    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM users'));
-
+    final count =
+        Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM users'));
     if ((count ?? 0) > 0) return;
-
-    final now = DateTime.now();
-
-    for (final u in [
-      {
-        'id': 'u1',
-        'name': 'Maria Santos',
-        'email': 'tourist@iweave.ph',
-        'role': 'tourist',
-        'phone': null,
-        'avatarUrl': null,
-        'address': null,
-        'createdAt': now.subtract(const Duration(days: 30)).toIso8601String(),
-      },
-      {
-        'id': 'u2',
-        'name': 'Nanay Rosa',
-        'email': 'weaver@iweave.ph',
-        'role': 'weaver',
-        'phone': null,
-        'avatarUrl': null,
-        'address': null,
-        'createdAt': now.subtract(const Duration(days: 60)).toIso8601String(),
-      },
-      {
-        'id': 'u3',
-        'name': 'Admin User',
-        'email': 'admin@iweave.ph',
-        'role': 'admin',
-        'phone': null,
-        'avatarUrl': null,
-        'address': null,
-        'createdAt': now.subtract(const Duration(days: 90)).toIso8601String(),
-      },
-      {
-        'id': 'u4',
-        'name': 'Demo User',
-        'email': 'demo@demo.com',
-        'role': 'tourist',
-        'phone': null,
-        'avatarUrl': null,
-        'address': null,
-        'createdAt': now.subtract(const Duration(days: 7)).toIso8601String(),
-      },
-    ]) {
-      await upsertUser(u);
-    }
   }
 }

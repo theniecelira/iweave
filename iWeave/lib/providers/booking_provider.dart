@@ -17,7 +17,6 @@ class BookingProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Seed mock bookings into DB on first ever load
     if (!_seeded) {
       final existing = await _db.getBookings(userId: userId);
       if (existing.isEmpty) {
@@ -55,6 +54,8 @@ class BookingProvider extends ChangeNotifier {
 
   Future<BookingModel> createBooking({
     required String userId,
+    required String userName,
+    required String userEmail,
     required String itemId,
     required String itemName,
     required String itemImage,
@@ -68,6 +69,8 @@ class BookingProvider extends ChangeNotifier {
     final booking = BookingModel(
       id: 'b_${DateTime.now().millisecondsSinceEpoch}',
       userId: userId,
+      userName: userName,
+      userEmail: userEmail,
       itemId: itemId,
       itemName: itemName,
       itemImage: itemImage,
@@ -93,11 +96,13 @@ class BookingProvider extends ChangeNotifier {
     if (idx != -1) {
       final old = _bookings[idx];
       _bookings[idx] = BookingModel(
-        id: old.id, userId: old.userId, itemId: old.itemId,
-        itemName: old.itemName, itemImage: old.itemImage, type: old.type,
-        status: BookingStatus.cancelled, bookingDate: old.bookingDate,
-        checkIn: old.checkIn, checkOut: old.checkOut,
-        guests: old.guests, totalAmount: old.totalAmount,
+        id: old.id, userId: old.userId,
+        userName: old.userName, userEmail: old.userEmail,
+        itemId: old.itemId, itemName: old.itemName, itemImage: old.itemImage,
+        type: old.type, status: BookingStatus.cancelled,
+        bookingDate: old.bookingDate, checkIn: old.checkIn,
+        checkOut: old.checkOut, guests: old.guests,
+        totalAmount: old.totalAmount,
       );
       notifyListeners();
     }
@@ -110,9 +115,10 @@ class BookingProvider extends ChangeNotifier {
     if (idx != -1) {
       final old = _bookings[idx];
       _bookings[idx] = BookingModel(
-        id: old.id, userId: old.userId, itemId: old.itemId,
-        itemName: old.itemName, itemImage: old.itemImage, type: old.type,
-        status: newStatus, bookingDate: old.bookingDate,
+        id: old.id, userId: old.userId,
+        userName: old.userName, userEmail: old.userEmail,
+        itemId: old.itemId, itemName: old.itemName, itemImage: old.itemImage,
+        type: old.type, status: newStatus, bookingDate: old.bookingDate,
         checkIn: old.checkIn, checkOut: old.checkOut,
         guests: old.guests, totalAmount: old.totalAmount, notes: old.notes,
       );

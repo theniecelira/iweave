@@ -234,7 +234,10 @@ class _TourDetailScreenState extends State<TourDetailScreen> {
     }
     setState(() => _isBooking = true);
     await context.read<BookingProvider>().createBooking(
-      userId: user.id, itemId: tour.id, itemName: tour.title,
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      itemId: tour.id, itemName: tour.title,
       itemImage: tour.imageUrl, type: BookingType.tour,
       checkIn: _checkIn!, checkOut: _checkIn!.add(Duration(days: tour.durationDays)),
       guests: _guests, totalAmount: tour.price * _guests,

@@ -694,6 +694,8 @@ class _ReviewStep extends StatelessWidget {
     // 2. Create a REAL booking in BookingProvider so it shows in My Bookings
     context.read<BookingProvider>().createBooking(
       userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
       itemId: 'itinerary_${it.id}',
       itemName: '${it.tripName} (${it.numberOfDays}-Day Custom Itinerary)',
       itemImage: 'https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=400',

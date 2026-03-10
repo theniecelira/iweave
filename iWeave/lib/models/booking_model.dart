@@ -4,6 +4,8 @@ enum BookingType { tour, accommodation, product }
 class BookingModel {
   final String id;
   final String userId;
+  final String userName;
+  final String userEmail;
   final String itemId;
   final String itemName;
   final String itemImage;
@@ -19,6 +21,8 @@ class BookingModel {
   const BookingModel({
     required this.id,
     required this.userId,
+    this.userName = '',
+    this.userEmail = '',
     required this.itemId,
     required this.itemName,
     required this.itemImage,
@@ -34,7 +38,7 @@ class BookingModel {
 
   String get statusLabel {
     switch (status) {
-      case BookingStatus.pending: return 'Pending';
+      case BookingStatus.pending:   return 'Pending';
       case BookingStatus.confirmed: return 'Confirmed';
       case BookingStatus.completed: return 'Completed';
       case BookingStatus.cancelled: return 'Cancelled';
