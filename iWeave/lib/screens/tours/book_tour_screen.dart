@@ -215,7 +215,7 @@ class _TourPackagesTab extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, crossAxisSpacing: 12,
-                    mainAxisSpacing: 12, childAspectRatio: 0.70,
+                    mainAxisSpacing: 12, childAspectRatio: 0.62,
                   ),
                   itemCount: provider.tours.length,
                   itemBuilder: (_, i) {

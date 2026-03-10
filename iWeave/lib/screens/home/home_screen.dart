@@ -428,33 +428,71 @@ class _CulturalBanner extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 120,
-        decoration: BoxDecoration(
-          color: AppColors.primaryDark,
+        height: 145,
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          image: const DecorationImage(
-            image: NetworkImage('https://images.unsplash.com/photo-1583394293214-0b7f63f85e78?w=600'),
-            fit: BoxFit.cover, opacity: 0.4,
-          ),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Banig Weaving Experience', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 6),
-            const Text('Immerse in Basey\'s centuries-old tradition', style: TextStyle(color: Colors.white70, fontSize: 12)),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                'assets/images/mat-weaving.jpg',
+                fit: BoxFit.cover,
               ),
-              child: const Text('Book Your Weaving Tour', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-            ),
-          ],
+
+              Container(
+                color: AppColors.primaryDark.withOpacity(0.45),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Banig Weaving Experience',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Immerse in Basey\'s centuries-old tradition',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusCircle,
+                        ),
+                      ),
+                      child: const Text(
+                        'Book Your Weaving Tour',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -475,8 +513,9 @@ class _NewCollectionsBanner extends StatelessWidget {
           color: AppColors.primary,
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           image: const DecorationImage(
-            image: NetworkImage('https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=600'),
-            fit: BoxFit.cover, opacity: 0.3,
+            image: AssetImage('assets/images/banner1.jpg'),
+            fit: BoxFit.cover,
+            opacity: 0.3,
           ),
         ),
         padding: const EdgeInsets.all(18),
@@ -487,17 +526,38 @@ class _NewCollectionsBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Customized Products', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
-                  Text('Weave your story, Craft your style!', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                  Text(
+                    'Customized Products',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    'Weave your story, Craft your style!',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                    ),
+                  ),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
               ),
-              child: const Text('Shop Now', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.w700)),
+              child: const Text(
+                'Shop Now',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ],
         ),

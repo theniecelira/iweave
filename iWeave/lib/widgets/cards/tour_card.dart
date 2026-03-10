@@ -116,12 +116,12 @@ class TourCard extends StatelessWidget {
                       if (tour.originalPrice > 0)
                         Text(AppFormatters.currency(tour.originalPrice),
                           style: const TextStyle(
-                            fontSize: 11, color: AppColors.textHint,
+                            fontSize: 10, color: AppColors.textHint,
                             decoration: TextDecoration.lineThrough,
                           )),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 2),
                       Text(AppFormatters.currency(tour.price),
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.primary)),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary)),
                     ],
                   ),
                 ],
