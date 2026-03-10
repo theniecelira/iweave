@@ -42,7 +42,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     final auth = context.read<AuthProvider>();
     if (auth.isAuthenticated) {
-      Navigator.pushReplacementNamed(context, '/main');
+      final route = context.read<AuthProvider>().postLoginRoute;
+      Navigator.pushReplacementNamed(context, route);
     } else {
       // Check if first time
       Navigator.pushReplacementNamed(context, '/onboarding');

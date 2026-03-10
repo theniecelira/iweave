@@ -1,45 +1,56 @@
 import 'package:flutter/material.dart';
 import '../models/booking_model.dart';
 import '../data/mock_data.dart';
+import '../services/database_service.dart';
 
 class BookingProvider extends ChangeNotifier {
+  final DatabaseService _db = DatabaseService();
   List<BookingModel> _bookings = [];
-  final List<BookingModel> _sessionBookings = []; // Track bookings created in this session
   bool _isLoading = false;
-  bool _hasLoaded = false;
+  bool _seeded = false;
 
   List<BookingModel> get bookings => _bookings;
   bool get isLoading => _isLoading;
 
+  /// Load bookings for a specific user. Seeds mock data on first run.
   Future<void> loadBookings(String userId) async {
-    // If already loaded, don't overwrite session bookings
-    if (_hasLoaded) return;
-
     _isLoading = true;
     notifyListeners();
-    await Future.delayed(const Duration(milliseconds: 600));
 
-    // Load mock bookings for the user
-    final mockUserBookings = mockBookings.where((b) => b.userId == userId).toList();
+    // Seed mock bookings into DB on first ever load
+    if (!_seeded) {
+      final existing = await _db.getBookings(userId: userId);
+      if (existing.isEmpty) {
+        for (final b in mockBookings.where((b) => b.userId == userId)) {
+          await _db.insertBooking(b);
+        }
+      }
+      _seeded = true;
+    }
 
-    // Merge: session bookings first (newest), then mock bookings (avoiding duplicates)
-    final sessionIds = _sessionBookings.map((b) => b.id).toSet();
-    final mergedBookings = [
-      ..._sessionBookings,
-      ...mockUserBookings.where((b) => !sessionIds.contains(b.id)),
-    ];
-
-    _bookings = mergedBookings;
-    _hasLoaded = true;
+    _bookings = await _db.getBookings(userId: userId);
     _isLoading = false;
     notifyListeners();
   }
 
-  /// Force reload bookings (e.g., after login with different user)
-  Future<void> reloadBookings(String userId) async {
-    _hasLoaded = false;
-    _sessionBookings.clear();
-    await loadBookings(userId);
+  /// Load ALL bookings across all users (admin use)
+  Future<void> loadAllBookings() async {
+    _isLoading = true;
+    notifyListeners();
+
+    if (!_seeded) {
+      final existing = await _db.getBookings();
+      if (existing.isEmpty) {
+        for (final b in mockBookings) {
+          await _db.insertBooking(b);
+        }
+      }
+      _seeded = true;
+    }
+
+    _bookings = await _db.getBookings();
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<BookingModel> createBooking({
@@ -54,7 +65,6 @@ class BookingProvider extends ChangeNotifier {
     required double totalAmount,
     String? notes,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 1000));
     final booking = BookingModel(
       id: 'b_${DateTime.now().millisecondsSinceEpoch}',
       userId: userId,
@@ -71,40 +81,48 @@ class BookingProvider extends ChangeNotifier {
       notes: notes,
     );
 
-    // Add to both session bookings and active bookings
-    _sessionBookings.insert(0, booking);
+    await _db.insertBooking(booking);
     _bookings.insert(0, booking);
     notifyListeners();
     return booking;
   }
 
-  void cancelBooking(String bookingId) {
+  Future<void> cancelBooking(String bookingId) async {
+    await _db.updateBookingStatus(bookingId, BookingStatus.cancelled);
     final idx = _bookings.indexWhere((b) => b.id == bookingId);
     if (idx != -1) {
       final old = _bookings[idx];
-      final cancelled = BookingModel(
-        id: old.id,
-        userId: old.userId,
-        itemId: old.itemId,
-        itemName: old.itemName,
-        itemImage: old.itemImage,
-        type: old.type,
-        status: BookingStatus.cancelled,
-        bookingDate: old.bookingDate,
-        checkIn: old.checkIn,
-        checkOut: old.checkOut,
-        guests: old.guests,
-        totalAmount: old.totalAmount,
+      _bookings[idx] = BookingModel(
+        id: old.id, userId: old.userId, itemId: old.itemId,
+        itemName: old.itemName, itemImage: old.itemImage, type: old.type,
+        status: BookingStatus.cancelled, bookingDate: old.bookingDate,
+        checkIn: old.checkIn, checkOut: old.checkOut,
+        guests: old.guests, totalAmount: old.totalAmount,
       );
-      _bookings[idx] = cancelled;
-
-      // Also update in session bookings if present
-      final sessionIdx = _sessionBookings.indexWhere((b) => b.id == bookingId);
-      if (sessionIdx != -1) {
-        _sessionBookings[sessionIdx] = cancelled;
-      }
-
       notifyListeners();
     }
+  }
+
+  /// Update status to any value (admin use)
+  Future<void> updateStatus(String bookingId, BookingStatus newStatus) async {
+    await _db.updateBookingStatus(bookingId, newStatus);
+    final idx = _bookings.indexWhere((b) => b.id == bookingId);
+    if (idx != -1) {
+      final old = _bookings[idx];
+      _bookings[idx] = BookingModel(
+        id: old.id, userId: old.userId, itemId: old.itemId,
+        itemName: old.itemName, itemImage: old.itemImage, type: old.type,
+        status: newStatus, bookingDate: old.bookingDate,
+        checkIn: old.checkIn, checkOut: old.checkOut,
+        guests: old.guests, totalAmount: old.totalAmount, notes: old.notes,
+      );
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteBooking(String bookingId) async {
+    await _db.deleteBooking(bookingId);
+    _bookings.removeWhere((b) => b.id == bookingId);
+    notifyListeners();
   }
 }

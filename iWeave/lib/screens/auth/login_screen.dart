@@ -26,7 +26,10 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await context.read<AuthProvider>().login(
       _emailCtrl.text.trim(), _passCtrl.text,
     );
-    if (success && mounted) Navigator.pushReplacementNamed(context, '/main');
+    if (success && mounted) {
+      final route = context.read<AuthProvider>().postLoginRoute;
+      Navigator.pushReplacementNamed(context, route);
+    }
   }
 
   @override

@@ -17,6 +17,10 @@ import '../screens/weavers/weavers_screen.dart';
 import '../screens/weavers/weaver_detail_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/itinerary/itinerary_builder_screen.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
+import '../screens/admin/admin_bookings_screen.dart';
+import '../screens/admin/admin_orders_screen.dart';
+import '../screens/admin/admin_users_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -63,6 +67,17 @@ class AppRouter {
         return _slide(const ProfileScreen());
       case '/itinerary-builder':
         return _slide(const ItineraryBuilderScreen());
+
+      // ─── ADMIN ROUTES ────────────────────────────────────────────────
+      case '/admin':
+        return _fade(const AdminDashboardScreen());
+      case '/admin-bookings':
+        return _slide(const AdminBookingsScreen());
+      case '/admin-orders':
+        return _slide(const AdminOrdersScreen());
+      case '/admin-users':
+        return _slide(const AdminUsersScreen());
+
       default:
         return _fade(const SplashScreen());
     }

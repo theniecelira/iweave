@@ -10,6 +10,9 @@ import 'providers/tour_provider.dart';
 import 'providers/booking_provider.dart';
 import 'providers/notification_provider.dart';
 import 'providers/itinerary_provider.dart';
+import 'providers/order_provider.dart';
+import 'providers/admin_provider.dart';
+import 'services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +21,12 @@ void main() async {
     statusBarIconBrightness: Brightness.light,
   ));
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  // Initialize database and seed data
+  final db = DatabaseService();
+  await db.database; // Ensure DB is created
+  await db.seedInitialData();
+
   runApp(const IWeaveApp());
 }
 
@@ -35,6 +44,8 @@ class IWeaveApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => ItineraryProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProvider()),
       ],
       child: MaterialApp(
         title: 'iWeave',

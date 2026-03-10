@@ -14,6 +14,7 @@ class AuthProvider extends ChangeNotifier {
   AuthStatus get status => _status;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
+  bool get isAdmin => _user?.isAdmin ?? false;
 
   Future<void> checkAuthStatus() async {
     _status = AuthStatus.loading;
@@ -27,6 +28,9 @@ class AuthProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  /// Returns the route to navigate to after login
+  String get postLoginRoute => isAdmin ? '/admin' : '/main';
 
   Future<bool> login(String email, String password) async {
     _status = AuthStatus.loading;
