@@ -22,13 +22,15 @@ import '../screens/admin/admin_bookings_screen.dart';
 import '../screens/admin/admin_orders_screen.dart';
 import '../screens/admin/admin_users_screen.dart';
 
+import '../screens/onboarding/welcome_screen.dart';
+
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
         return _fade(const SplashScreen());
       case '/onboarding':
-        return _slide(const OnboardingScreen());
+        return _slide(const WelcomeScreen());
       case '/login':
         return _slide(const LoginScreen());
       case '/signup':
