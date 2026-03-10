@@ -172,7 +172,7 @@ class AccommodationCard extends StatelessWidget {
                     const SizedBox(width: 2),
                     Text('${accommodation.rating}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
                     const Spacer(),
-                    if (accommodation.freeWifi)
+                    if (accommodation.amenities.contains('WiFi'))
                       const Icon(Icons.wifi_rounded, size: 14, color: AppColors.textSecondary),
                   ]),
                   const SizedBox(height: 4),
@@ -180,7 +180,7 @@ class AccommodationCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                     maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 2),
-                  Text('${accommodation.beds} ${accommodation.beds == 1 ? 'bed' : 'beds'} · ${accommodation.type}',
+                  Text(accommodation.type,
                     style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
                   const SizedBox(height: 6),
                   Row(children: [

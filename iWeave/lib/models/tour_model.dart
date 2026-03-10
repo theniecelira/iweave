@@ -50,46 +50,50 @@ class AccommodationModel {
   final double pricePerNight;
   final String imageUrl;
   final double rating;
-  final String amenities;
-  final int beds;
-  final bool freeWifi;
-  bool isFavorite;
+  final int reviewCount;
+  final List<String> amenities;
+  final String location;
 
   AccommodationModel({
     required this.id,
     required this.name,
-    required this.type,
     required this.description,
-    required this.pricePerNight,
     required this.imageUrl,
+    required this.location,
+    required this.pricePerNight,
     required this.rating,
+    required this.reviewCount,
     required this.amenities,
-    required this.beds,
-    this.freeWifi = true,
-    this.isFavorite = false,
+    required this.type,
   });
 }
 
 class RestaurantModel {
   final String id;
   final String name;
-  final String type;
+  final String cuisine;
   final String description;
   final String imageUrl;
   final double rating;
-  final String hours;
-  final bool isOpen;
-  bool isFavorite;
+  final int reviewCount;
+  final String priceRange;
+  final String location;
+  final String openHours;
+  final bool isHalal;
+  final int averageMealCost;
 
   RestaurantModel({
     required this.id,
     required this.name,
-    required this.type,
     required this.description,
     required this.imageUrl,
+    required this.cuisine,
+    required this.priceRange,
     required this.rating,
-    required this.hours,
-    this.isOpen = true,
-    this.isFavorite = false,
+    required this.reviewCount,
+    required this.location,
+    required this.openHours,
+    required this.isHalal,
+    required this.averageMealCost,
   });
 }

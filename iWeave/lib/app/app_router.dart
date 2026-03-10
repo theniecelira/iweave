@@ -14,6 +14,7 @@ import '../screens/bookings/bookings_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/weavers/weavers_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/itinerary/itinerary_builder_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -52,6 +53,8 @@ class AppRouter {
         return _slide(const WeaversScreen());
       case '/profile':
         return _slide(const ProfileScreen());
+      case '/itinerary-builder':
+        return _slide(const ItineraryBuilderScreen());
       default:
         return _fade(const SplashScreen());
     }

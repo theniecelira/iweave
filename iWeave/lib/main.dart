@@ -9,6 +9,7 @@ import 'providers/cart_provider.dart';
 import 'providers/tour_provider.dart';
 import 'providers/booking_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/itinerary_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,7 @@ class IWeaveApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TourProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => ItineraryProvider()),
       ],
       child: MaterialApp(
         title: 'iWeave',

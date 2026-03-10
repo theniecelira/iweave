@@ -225,9 +225,10 @@ class _OrderSummary extends StatelessWidget {
               label: 'Continue Shopping',
               onPressed: () {
                 Provider.of<CartProvider>(context, listen: false).clear();
-                Navigator.popUntil(context, ModalRoute.withName('/main'));
+                Navigator.of(context).pop(); // close dialog
+                Navigator.pushReplacementNamed(context, '/main', arguments: 0);
               },
-            ),
+            )
           ],
         ),
       ),

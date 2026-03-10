@@ -35,13 +35,52 @@ class BookTourScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: Column(
           children: [
-            _TourPackagesTab(),
-            _HotelsTab(),
-            _RestaurantsTab(),
-            _ComingSoonTab(label: 'Transport', icon: Icons.directions_bus_rounded),
-            _ComingSoonTab(label: 'Flights', icon: Icons.flight_rounded),
+            GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/itinerary-builder'),
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF7D1935), Color(0xFF5A1025)],
+                    begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(children: [
+                  const Icon(Icons.map_rounded, color: Colors.white, size: 26),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('Build Your Custom Itinerary',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
+                      Text('Pick attractions, dining, stays & weaving workshops day by day',
+                        style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    ]),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text('Plan Now',
+                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                ]),
+              ),
+            ),
+            const Expanded(child: TabBarView(
+              children: [
+                _TourPackagesTab(),
+                _HotelsTab(),
+                _RestaurantsTab(),
+                _ComingSoonTab(label: 'Transport', icon: Icons.directions_bus_rounded),
+                _ComingSoonTab(label: 'Flights', icon: Icons.flight_rounded),
+              ],
+            )),
           ],
         ),
       ),
@@ -277,7 +316,7 @@ class _AccommodationDetailSheet extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(accommodation.description, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.6)),
                 const SizedBox(height: 16),
-                _ChipRow(items: accommodation.amenities.split(', ')),
+                _ChipRow(items: List<String>.from(accommodation.amenities)),
                 const SizedBox(height: 20),
                 Row(children: [
                   Text(AppFormatters.currency(accommodation.pricePerNight),
@@ -372,12 +411,12 @@ class _RestaurantsTab extends StatelessWidget {
                               Expanded(child: Text(r.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                               Row(children: List.generate(5, (j) => Icon(Icons.star_rounded, size: 12, color: j < r.rating.floor() ? AppColors.star : AppColors.border))),
                             ]),
-                            Text(r.type, style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
+                            Text(r.cuisine, style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
                             const SizedBox(height: 4),
                             Row(children: [
                               Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle)),
                               const SizedBox(width: 4),
-                              Text(r.hours, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                              Text(r.openHours, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                             ]),
                             const SizedBox(height: 8),
                             Row(children: [
