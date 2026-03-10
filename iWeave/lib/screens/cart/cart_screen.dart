@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/utils/formatters.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../widgets/common/app_button.dart';
 import '../../widgets/common/loading_widget.dart';
 
@@ -192,14 +194,61 @@ class _OrderSummary extends StatelessWidget {
           AppButton(
             label: 'Proceed to Checkout',
             icon: const Icon(Icons.lock_outline_rounded, size: 18, color: Colors.white),
-            onPressed: () => _showCheckoutSuccess(context),
+            onPressed: () => _checkout(context),
           ),
         ],
       ),
     );
   }
 
-  void _showCheckoutSuccess(BuildContext context) {
+  Future<void> _checkout(BuildContext context) async {
+    final auth = context.read<AuthProvider>();
+    final orderProvider = context.read<OrderProvider>();
+    final user = auth.user;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to place an order.')),
+      );
+      return;
+    }
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await orderProvider.placeOrder(
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        cartItems: cart.items,
+        subtotal: cart.subtotal,
+        shippingFee: cart.shippingFee,
+      );
+
+      // Dismiss loading
+      if (context.mounted) Navigator.of(context).pop();
+
+      // Show success dialog
+      if (context.mounted) _showSuccessDialog(context);
+    } catch (e) {
+      if (context.mounted) Navigator.of(context).pop(); // dismiss loading
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to place order: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -228,7 +277,7 @@ class _OrderSummary extends StatelessWidget {
                 Navigator.of(context).pop(); // close dialog
                 Navigator.pushReplacementNamed(context, '/main', arguments: 0);
               },
-            )
+            ),
           ],
         ),
       ),
