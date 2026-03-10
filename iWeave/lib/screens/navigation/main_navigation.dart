@@ -39,7 +39,7 @@ class _MainNavigationState extends State<MainNavigation> {
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: AppColors.surface,
+          color: const Color(0xFF6A0028),
           boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 16, offset: Offset(0, -4))],
         ),
         child: SafeArea(
@@ -91,12 +91,11 @@ class _NavItem extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
-                      color: isActive ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
                       isActive ? activeIcon : inactiveIcon,
-                      color: isActive ? AppColors.primary : AppColors.textHint,
+                      color: isActive ? AppColors.mainNavigationSelected : Colors.white,
                       size: 24,
                     ),
                   ),
@@ -118,7 +117,7 @@ class _NavItem extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 10, fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
-                  color: isActive ? AppColors.primary : AppColors.textHint,
+                  color: AppColors.white,
                   fontFamily: 'Poppins',
                 ),
               ),
