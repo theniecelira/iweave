@@ -11,8 +11,12 @@ class WelcomeScreen extends StatelessWidget {
         children: [
           
           Image.asset(
-            'assets/images/welcome-bg.jpg',
+            'assets/images/welcome-bg-bw.jpg',
             fit: BoxFit.cover,
+          ),
+
+          Container(
+            color: const Color(0xFF6A0028).withOpacity(0.5),
           ),
 
           Container(
