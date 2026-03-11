@@ -257,9 +257,22 @@ class _BannerCarouselState extends State<_BannerCarousel> {
   final _controller = PageController();
 
   final _banners = [
-    {'title': 'Basey, Samar', 'subtitle': 'iWeave Collection', 'color': AppColors.primary},
-    {'title': 'Woven. Experiences.\nConnections.', 'subtitle': 'Customize your banig product', 'color': Color(0xFF5D1030)},
-    {'title': 'Book Your Tour', 'subtitle': 'Explore Basey\'s hidden gems', 'color': Color(0xFF3D4A1A)},
+    {
+      'title': 'Basey, Samar', 
+      'subtitle': 'iWeave Collection', 
+      'image': 'assets/images/banner1.jpg',
+      'color': const Color(0xFF5D1030),
+    },
+    {
+      'title': 'Woven. Experiences.\nConnections.',
+      'subtitle': 'Customize your banig product', 
+      'image': 'assets/images/welcome-bg.jpg',
+      'color': Color(0xFF5D1030)},
+    {
+      'title': 'Book Your Tour',
+      'subtitle': 'Explore Basey\'s hidden gems', 
+      'image': 'assets/images/tour.jpg',
+      'color': Color(0xFF3D4A1A)},
   ];
 
   @override
@@ -279,45 +292,80 @@ class _BannerCarouselState extends State<_BannerCarousel> {
               final b = _banners[i];
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [b['color'] as Color, (b['color'] as Color).withRed(((b['color'] as Color).red + 30).clamp(0, 255))],
-                    begin: Alignment.topLeft, end: Alignment.bottomRight,
-                  ),
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-                ),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (b['subtitle'] != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.accent,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(b['subtitle'] as String, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
-                          ),
-                        const SizedBox(height: 8),
-                        Text(b['title'] as String, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.2)),
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                        decoration: BoxDecoration(
-                          color: Colors.white, borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
-                        ),
-                        child: const Text('Explore', style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        b['image'] as String,
+                        fit: BoxFit.cover,
                       ),
-                    ),
-                  ],
+
+                      Container(
+                        color: (b['color'] as Color).withOpacity(0.45),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (b['subtitle'] != null)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.accent,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      b['subtitle'] as String,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  b['title'] as String,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
+                                ),
+                                child: const Text(
+                                  'Explore',
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -380,33 +428,71 @@ class _CulturalBanner extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 120,
-        decoration: BoxDecoration(
-          color: AppColors.primaryDark,
+        height: 145,
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
-          image: const DecorationImage(
-            image: NetworkImage('https://images.unsplash.com/photo-1583394293214-0b7f63f85e78?w=600'),
-            fit: BoxFit.cover, opacity: 0.4,
-          ),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Banig Weaving Experience', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 6),
-            const Text('Immerse in Basey\'s centuries-old tradition', style: TextStyle(color: Colors.white70, fontSize: 12)),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                'assets/images/mat-weaving.jpg',
+                fit: BoxFit.cover,
               ),
-              child: const Text('Book Your Weaving Tour', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-            ),
-          ],
+
+              Container(
+                color: AppColors.primaryDark.withOpacity(0.45),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Banig Weaving Experience',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Immerse in Basey\'s centuries-old tradition',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusCircle,
+                        ),
+                      ),
+                      child: const Text(
+                        'Book Your Weaving Tour',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -427,8 +513,9 @@ class _NewCollectionsBanner extends StatelessWidget {
           color: AppColors.primary,
           borderRadius: BorderRadius.circular(AppDimensions.radiusXL),
           image: const DecorationImage(
-            image: NetworkImage('https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=600'),
-            fit: BoxFit.cover, opacity: 0.3,
+            image: AssetImage('assets/images/banner1.jpg'),
+            fit: BoxFit.cover,
+            opacity: 0.3,
           ),
         ),
         padding: const EdgeInsets.all(18),
@@ -439,17 +526,38 @@ class _NewCollectionsBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Customized Products', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
-                  Text('Weave your story, Craft your style!', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                  Text(
+                    'Customized Products',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    'Weave your story, Craft your style!',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                    ),
+                  ),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusCircle),
               ),
-              child: const Text('Shop Now', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.w700)),
+              child: const Text(
+                'Shop Now',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ],
         ),

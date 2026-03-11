@@ -138,7 +138,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       const _DividerWithText(text: 'OR'),
                       const SizedBox(height: 20),
                       _SocialButton(
-                        icon: Icons.g_mobiledata_rounded,
+                        icon: Image.asset(
+                          'assets/images/google-logo.png',
+                          height: 22,
+                        ),
                         label: 'Continue with Google',
                         onTap: () => _showComingSoon(context),
                       ),
@@ -154,23 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      // Demo hint
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.tagBg,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('🧪 Demo Accounts:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
-                            SizedBox(height: 4),
-                            Text('demo@demo.com / demo123', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'monospace')),
-                            Text('tourist@iweave.ph / tourist123', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'monospace')),
-                          ],
-                        ),
-                      ),
+
                     ],
                   ),
                 ),
@@ -207,7 +194,10 @@ class _DividerWithText extends StatelessWidget {
 }
 
 class _SocialButton extends StatelessWidget {
-  final IconData icon;
+  // final IconData icon;
+
+  final Widget icon;
+
   final String label;
   final VoidCallback onTap;
   const _SocialButton({required this.icon, required this.label, required this.onTap});
@@ -221,12 +211,14 @@ class _SocialButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.border),
           borderRadius: BorderRadius.circular(14),
-          color: AppColors.surface,
+          // color: AppColors.surface,
+          color: Colors.transparent,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 22, color: AppColors.textSecondary),
+            // Icon(icon, size: 22, color: AppColors.textSecondary),
+            icon,
             const SizedBox(width: 10),
             Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
           ],

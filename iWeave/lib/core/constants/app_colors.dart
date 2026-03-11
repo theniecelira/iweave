@@ -25,4 +25,9 @@ class AppColors {
   static const Color star = Color(0xFFFBC02D);
   static const Color tagBg = Color(0xFFF0E8E4);
   static const Color tagText = Color(0xFF7D1935);
+
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color black = Color(0xFF000000);
+
+  static const Color mainNavigationSelected = Color(0xFFFF9933);
 }
